@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <plugin name="model_spawner" filename="libModelSpawner.so">
+
+      <counter>5</counter>
+
+      <include1>
+        <uri>model://long_block</uri>
+        <pose>-1.0 2.0 0 0 0 0</pose>
+        <name>longblock_1</name>
+        <time>1</time>
+      </include1>
+
+      <include2>
+        <uri>model://long_block</uri>
+        <pose>0 0 40 0 0 0</pose>
+        <name>longblock_0</name>
+        <time>0</time>
+      </include2>
+
+      <include3>
+        <uri>model://long_block</uri>
+        <pose>10.2 0 0 0 0 0</pose>
+        <name>longblock_2</name>
+        <time>2</time>
+      </include3>
+
+      <include4>
+        <uri>model://cylinder</uri>
+        <pose>-1.0 2.0 10 0 2 0</pose>
+        <name>block1</name>
+        <time>1</time>
+      </include4>
+
+      <include5>
+        howdy
+        <uri>model://sphere</uri>
+        <pose>-1.0 4 30 0 0 0</pose>
+        <name>box4</name>
+        <time>5</time>
+      </include5>
+    </plugin>
+  </world>
+</sdf>
