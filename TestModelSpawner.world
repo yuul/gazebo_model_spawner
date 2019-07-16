@@ -31,14 +31,14 @@
         <uri>model://long_block</uri>
         <pose>10.2 0 0 0 0 0</pose>
         <name>longblock_2</name>
-        <time>2</time>
+        <time>1</time>
       </include3>
 
       <include4>
         <uri>model://cylinder</uri>
         <pose>-1.0 2.0 10 0 2 0</pose>
         <name>block1</name>
-        <time>1</time>
+        <time>1.2</time>
       </include4>
 
       <include5>

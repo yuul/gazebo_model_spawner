@@ -3,6 +3,7 @@
 #include <string>
 
 #include <ignition/math/Pose3.hh>
+#include <gazebo/common/common.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/World.hh>
 #include <gazebo/transport/transport.hh>
@@ -14,9 +15,9 @@ using namespace gazebo;
 GZ_REGISTER_WORLD_PLUGIN(ModelSpawner)
 
 /////////////////////////////////////////////////
-ModelSpawner::ModelSpawner()
+ModelSpawner::ModelSpawner(): msgMap(std::unordered_map<double, std::vector<std::string>>())
 {
-  //printf("Hello World!\n");
+  //this->msgMap = std::unordered_map<double, std::vector<std::string>>() ;
 }
 
 /////////////////////////////////////////////////
@@ -27,9 +28,8 @@ ModelSpawner::~ModelSpawner()
 /////////////////////////////////////////////////
 void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
+  // iterate over every element in the plugin
   int count = _sdf->Get<int>("counter");
-  std::cout<<count<<std::endl;
-
   for(int i = 1; i <= count; ++i)
   {
     std::string newName = "include" + std::to_string(i);
@@ -42,7 +42,7 @@ void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       std::string attName = child->Get<std::string>("name");
       std::string attURI = child->Get<std::string>("uri");
       std::string attPose = child->Get<std::string>("pose");
-      int attTime = child->Get<int>("time");
+      double attTime = child->Get<double>("time");
 
       // parse pose string to integers
       double pose [6];
@@ -118,21 +118,51 @@ void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
         + std::to_string(pose[3]) + " " + std::to_string(pose[4]) + " "
         + std::to_string(pose[5]) + "</pose>";
       }
-
-      // Create a new transport node, initialize with world, and create publisher
-      transport::NodePtr node(new transport::Node());
-      node->Init(_world->Name());
-      transport::PublisherPtr factoryPub = node->Advertise<msgs::Factory>("~/factory");
-
-      msgs::Factory msg;
       std::string newModelStr = sdfFront + namePose + sdfBack;
-      msg.set_sdf(newModelStr);
-      factoryPub->Publish(msg);
+
+      // adds to or creates a new vector
+      if(this->msgMap.find(attTime) == this->msgMap.end())
+      {
+        std::vector<std::string> newVec;
+        newVec.push_back(newModelStr);
+        this->msgMap[attTime] = newVec;
+      }
+      else
+      {
+        this->msgMap[attTime].push_back(newModelStr);
+      }
     }
   }
+
+  // Create a new transport node, initialize with world, and create publisher
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_world->Name());
+  this->factoryPub = node->Advertise<msgs::Factory>("~/factory");
+
+  this->updateConnection= event::Events::ConnectWorldUpdateBegin(
+    std::bind(&ModelSpawner::Update, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
 void ModelSpawner::Update(const common::UpdateInfo &_info)
 {
+  //iterate over all members of map to find the ones to publish
+  std::unordered_map<double,std::vector<std::string>>::iterator itr = this->msgMap.begin();
+  while (itr != this->msgMap.end()) {
+
+    if(itr->first <= _info.simTime.Double())
+    {
+      for (size_t i = 0; i < itr->second.size(); i++) {
+
+        msgs::Factory msg;
+        msg.set_sdf(itr->second[i]);
+        this->factoryPub->Publish(msg);
+      }
+      double delVal = itr->first;
+      itr++;
+      this->msgMap.erase(delVal);
+    } else {
+      itr++;
+    }
+  }
 }
