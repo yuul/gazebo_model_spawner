@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <unistd.h>
 
 #include <ignition/math/Pose3.hh>
 #include <gazebo/common/common.hh>
@@ -80,13 +81,15 @@ void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       std::string sdfOutput;
       {
         std::ifstream myFile;
-        std::string filePath = "./models/" + filename + "/model.sdf";
+        std::string filePath = "/home/yuul/Desktop/model_spawner/models/" + filename + "/model.sdf";
         myFile.open(filePath);
-
+        char cwd [256];
+        getcwd(cwd, sizeof(cwd));
+        std::cout << cwd << '\n';
         // error checking
         if (!myFile)
         {
-          std::cerr << "Unable to open file " << filePath;
+          std::cerr << "Unable to open file " << filePath <<'\n';
           exit(1);
         }
 
