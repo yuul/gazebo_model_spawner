@@ -30,11 +30,10 @@ ModelSpawner::~ModelSpawner()
 void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   // iterate over every element in the plugin
-  int count = _sdf->Get<int>("counter");
+  int count = _sdf->Get<int>("count");
   for(int i = 1; i <= count; ++i)
   {
     std::string newName = "include" + std::to_string(i);
-
     if(_sdf->HasElement(newName))
     {
       sdf::ElementPtr child = _sdf->GetElement(newName);
@@ -85,7 +84,6 @@ void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
         myFile.open(filePath);
         char cwd [256];
         getcwd(cwd, sizeof(cwd));
-        std::cout << cwd << '\n';
         // error checking
         if (!myFile)
         {
@@ -144,6 +142,7 @@ void ModelSpawner::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   this->updateConnection= event::Events::ConnectWorldUpdateBegin(
     std::bind(&ModelSpawner::Update, this, std::placeholders::_1));
+
 }
 
 /////////////////////////////////////////////////

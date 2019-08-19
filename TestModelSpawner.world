@@ -42,7 +42,6 @@
       </include4>
 
       <include5>
-        howdy
         <uri>model://sphere</uri>
         <pose>-1.0 4 30 0 0 0</pose>
         <name>box4</name>
