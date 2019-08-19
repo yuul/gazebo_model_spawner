@@ -1,4 +1,6 @@
 # gazebo_model_spawner
 
 This plugin allows for generation of objects at different times and locations in a Gazebo simulation. To do this, first ensure that all Gazebo models are predefined in the `models/` directory. After that, modify the ModelSpawner.cc on line 83 to include the correct file path. To compile the plugin, create a `build/` directory, `cd` into it, and run `cmake ../` followed by `make`. Finally, register the plugin by editing your `~/.bashrc` file and including the line  
-```export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:~/model_spawner/build```
+```export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:~/model_spawner/build``` to register the plugin (you might also need to do the same for the models if you have not registered the models).
+
+The `.world` file for the plugin is altered slightly to accomodate the plugin. First, within the plugin portion of the sdf, there is a counter for the number of objects to be spawned. Each object is labeled `includex` where x is an integer from 1-counter. Each object has a uri, pose, and name just like how Gazebo normally has them. Finally, there is a new field, time, which corresponds to the time in the simulation that the object should be spawned at. To see an example of this, look in the `TestModelSpawner.world` file.
